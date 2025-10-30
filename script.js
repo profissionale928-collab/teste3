@@ -16,8 +16,6 @@ const noResults = document.getElementById('noResults');
 const tableBody = document.getElementById('tableBody');
 const resultCount = document.getElementById('resultCount');
 const btnSearch = document.querySelector('.btn-search');
-const btnExportEmails = document.getElementById('btnExportEmails');
-const btnExportPhones = document.getElementById('btnExportPhones');
 
 // Variável global para armazenar todos os resultados
 let allResults = [];
@@ -38,10 +36,6 @@ async function handleSearch(e) {
     // Limpar resultados anteriores
     clearResults();
     allResults = []; // Limpa resultados globais
-    
-    // Ocultar botões de exportação
-    if (btnExportEmails) btnExportEmails.classList.add('hidden');
-    if (btnExportPhones) btnExportPhones.classList.add('hidden');
     
     // Ocultar debug
     debugInfo.classList.add('hidden');
@@ -254,78 +248,6 @@ function exportData() {
 // Função para exportar emails
 function exportEmails() {
     if (allResults.length === 0) {
-        alert('Nenhum email para exportar. Realize uma busca primeiro.');
-        return;
-    }
-
-    const emails = allResults
-        .map(empresa => extractEmail(empresa))
-        .filter(email => email !== 'N/A');
-
-    if (emails.length === 0) {
-        alert('Nenhum email válido encontrado para exportar.');
-        return;
-    }
-
-    const emailsText = emails.join('\n');
-    
-    // Cria um Blob para download
-    const blob = new Blob([emailsText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    
-    // Cria um link temporário para iniciar o download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'emails_mei_export.txt';
-    document.body.appendChild(a);
-    a.click();
-    
-    // Limpa o link temporário e o URL do objeto
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    alert(`Exportação de emails concluída! ${emails.length} email(s) exportado(s) para "emails_mei_export.txt".`);
-}
-
-// Nova função para exportar telefones
-function exportPhones() {
-    if (allResults.length === 0) {
-        alert('Nenhum telefone para exportar. Realize uma busca primeiro.');
-        return;
-    }
-
-    const phones = allResults
-        .map(empresa => extractPhone(empresa))
-        .filter(phone => phone !== 'N/A');
-
-    if (phones.length === 0) {
-        alert('Nenhum telefone válido encontrado para exportar.');
-        return;
-    }
-
-    const phonesText = phones.join('\n');
-    
-    // Cria um Blob para download
-    const blob = new Blob([phonesText], { type: 'text/plain;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    
-    // Cria um link temporário para iniciar o download
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'telefones_mei_export.txt';
-    document.body.appendChild(a);
-    a.click();
-    
-    // Limpa o link temporário e o URL do objeto
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    
-    alert(`Exportação de telefones concluída! ${phones.length} telefone(s) exportado(s) para "telefones_mei_export.txt".`);
-}
-
-// Função para exibir resultados
-function exportEmails() {
-    if (allResults.length === 0) {
         alert('Nenhum resultado para exportar.');
         return;
     }
@@ -359,8 +281,44 @@ function exportEmails() {
     alert(`Exportação concluída! ${emails.length} e-mail(s) exportado(s) para "emails_mei_export.txt".`);
 }
 
+// Função para exportar telefones
+function exportPhones() {
+    if (allResults.length === 0) {
+        alert('Nenhum resultado para exportar.');
+        return;
+    }
+
+    const phones = allResults
+        .map(empresa => extractPhone(empresa))
+        .filter(phone => phone !== 'N/A');
+
+    if (phones.length === 0) {
+        alert('Nenhum telefone válido encontrado para exportar.');
+        return;
+    }
+
+    const phonesText = phones.join('\n');
+    
+    // Cria um Blob para download
+    const blob = new Blob([phonesText], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    
+    // Cria um link temporário para iniciar o download
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'telefones_mei_export.txt';
+    document.body.appendChild(a);
+    a.click();
+    
+    // Limpa o link temporário e o URL do objeto
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert(`Exportação concluída! ${phones.length} telefone(s) exportado(s) para "telefones_mei_export.txt".`);
+}
+
 // Função para exibir resultados
-function displayResults(records) {
+function displayResults(results) {
     // Limpar tabela
     tableBody.innerHTML = '';
 
@@ -390,11 +348,17 @@ function displayResults(records) {
     });
 
     // Atualizar contagem de resultados
-    resultCount.textContent = `${records.length} empresa(s) encontrada(s)`;
+    resultCount.textContent = `${results.length} empresa(s) encontrada(s)`;
 
     // Adiciona os botões de exportar
-    if (btnExportEmails) btnExportEmails.classList.remove('hidden');
-    if (btnExportPhones) btnExportPhones.classList.remove('hidden');
+    const exportEmailButton = document.getElementById('btnExportEmails');
+    const exportPhoneButton = document.getElementById('btnExportPhones');
+    if (exportEmailButton) {
+        exportEmailButton.classList.remove('hidden');
+    }
+    if (exportPhoneButton) {
+        exportPhoneButton.classList.remove('hidden');
+    }
 
     // Mostrar container de resultados
     resultsContainer.classList.remove('hidden');
@@ -424,8 +388,14 @@ function clearResults() {
     noResults.classList.add('hidden');
     debugInfo.classList.add('hidden');
     // Oculta os botões de exportar
-    if (btnExportEmails) btnExportEmails.classList.add('hidden');
-    if (btnExportPhones) btnExportPhones.classList.add('hidden');
+    const exportEmailButton = document.getElementById('btnExportEmails');
+    const exportPhoneButton = document.getElementById('btnExportPhones');
+    if (exportEmailButton) {
+        exportEmailButton.classList.add('hidden');
+    }
+    if (exportPhoneButton) {
+        exportPhoneButton.classList.add('hidden');
+    }
 }
 
 // Função para mostrar/ocultar spinner
@@ -513,11 +483,23 @@ setDefaultDates();
 
 // Event Listeners
 searchForm.addEventListener('submit', handleSearch);
-if (btnExportEmails) btnExportEmails.addEventListener('click', exportEmails);
-if (btnExportPhones) btnExportPhones.addEventListener('click', exportPhones);
+// Adiciona os listeners para os botões de exportar
+document.addEventListener('click', function(e) {
+    if (e.target.id === 'btnExportEmails') {
+        exportEmails(); // Chama a função que exporta apenas emails
+    } else if (e.target.id === 'btnExportPhones') {
+        exportPhones(); // Chama a função que exporta apenas telefones
+    }
+});
 
 // Ocultar os botões de exportar no início
 document.addEventListener('DOMContentLoaded', () => {
-    if (btnExportEmails) btnExportEmails.classList.add('hidden');
-    if (btnExportPhones) btnExportPhones.classList.add('hidden');
+    const exportEmailButton = document.getElementById('btnExportEmails');
+    const exportPhoneButton = document.getElementById('btnExportPhones');
+    if (exportEmailButton) {
+        exportEmailButton.classList.add('hidden');
+    }
+    if (exportPhoneButton) {
+        exportPhoneButton.classList.add('hidden');
+    }
 });
