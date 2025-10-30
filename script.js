@@ -390,7 +390,7 @@ function displayResults(records) {
     });
 
     // Atualizar contagem de resultados
-    resultCount.textContent = `${results.length} empresa(s) encontrada(s)`;
+    resultCount.textContent = `${records.length} empresa(s) encontrada(s)`;
 
     // Adiciona os botões de exportar
     if (btnExportEmails) btnExportEmails.classList.remove('hidden');
